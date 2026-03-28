@@ -1,0 +1,474 @@
+{
+  "name": "Phylee Leads",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "4ac2e976-344e-41df-bf5a-88d77e414d9f",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -608,
+        -128
+      ],
+      "id": "3213e4cf-8692-4a44-8509-b57fbfb61abb",
+      "name": "Webhook",
+      "webhookId": "4ac2e976-344e-41df-bf5a-88d77e414d9f"
+    },
+    {
+      "parameters": {
+        "from": "=+14155238886",
+        "to": "=+2348106787213",
+        "toWhatsapp": true,
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        512,
+        -64
+      ],
+      "id": "3104b518-1d71-4cdb-9c8a-073a6fa4f68e",
+      "name": "Send an SMS/MMS/WhatsApp message",
+      "credentials": {
+        "twilioApi": {
+          "id": "TBul9KiWmj9TfcZC",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Hello {{ $json.body.Body }}",
+        "options": {
+          "systemMessage": "You are a travel assistant for a Rave Travel & Tours.  When a customer messages you: \n\n1. Greet them warmly \n\n2. Ask for their destination interest, tuition fees budget, course option and how they intend paying their fees.\n\n3. Recommend suitable courses and institutions on their budget\n \n4. Be friendly and professional.\n\nRules:\n- Once you have collected ALL four details, summarize what they told you and tell them our service charge. Watch for their response, if they ask for account details end your message with exactly this tag on a new line: [Alright]\n- If the customer is vague, unresponsive or says \n  things like \"just checking\" or \"never mind\", \n  end your message with: [Hello?]\n\nCompany destinations: UK, Canada, Australia, Ireland and Austria\n\nBudget ranges: - Budget ($500-$1000): Canada, Australia - Mid (GBP 1000-GBP 3000): UK"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -240,
+        -416
+      ],
+      "id": "7108ad47-a6cf-43d0-a2ab-5de1b79fb7ac",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        64
+      ],
+      "id": "b66673ac-0e35-4952-a1de-d6fedc6b28d7",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "apXqhbX6ZjHJvf9E",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.SmsSid }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        64
+      ],
+      "id": "6054ab76-79f5-4a2c-8bcf-ba81c9343fb0",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4689b25b-a484-4701-a106-1c3cda3ec90b",
+              "leftValue": "={{ $('AI Agent').item.json.output }}",
+              "rightValue": "[Alright]",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        768,
+        -320
+      ],
+      "id": "9cfcafb1-68bc-4753-a25f-ce6a0d603f0a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "from": "+14155238886",
+        "to": "=+2348106787213",
+        "toWhatsapp": true,
+        "message": "Hi Rave, this one is serious",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        1216,
+        -544
+      ],
+      "id": "6c21f638-5508-48cf-b0b9-0750f71e30ec",
+      "name": "Send an SMS/MMS/WhatsApp message1",
+      "credentials": {
+        "twilioApi": {
+          "id": "TBul9KiWmj9TfcZC",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1E5krRnVwZG4ufFq0gHAXDETpGnTl2SMeXHOgKsd308Y",
+          "mode": "list",
+          "cachedResultName": "Rave Travel Lead Sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1E5krRnVwZG4ufFq0gHAXDETpGnTl2SMeXHOgKsd308Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1E5krRnVwZG4ufFq0gHAXDETpGnTl2SMeXHOgKsd308Y/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Country": "={{ $json.body }}",
+            "Status": "={{ $json.status }}",
+            "Phone Number": "={{ $json.from }}",
+            "Name": "={{ $json.body }}",
+            "row_number": 2
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Country",
+              "displayName": "Country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1200,
+        0
+      ],
+      "id": "6a0cd654-7af3-42a1-bc12-12b840145daa",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleApi": {
+          "id": "mTQlZlXKXztyha75",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1E5krRnVwZG4ufFq0gHAXDETpGnTl2SMeXHOgKsd308Y",
+          "mode": "list",
+          "cachedResultName": "Rave Travel Lead Sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1E5krRnVwZG4ufFq0gHAXDETpGnTl2SMeXHOgKsd308Y/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1E5krRnVwZG4ufFq0gHAXDETpGnTl2SMeXHOgKsd308Y/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": 2
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Country",
+              "displayName": "Country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1568,
+        -352
+      ],
+      "id": "de018582-e97e-4eaf-a793-c15726780624",
+      "name": "Update row in sheet1",
+      "credentials": {
+        "googleApi": {
+          "id": "mTQlZlXKXztyha75",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        192,
+        -272
+      ],
+      "id": "b4cdd23c-7f79-4814-bf9b-e6fed1da98de",
+      "name": "Loop Over Items"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an SMS/MMS/WhatsApp message": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an SMS/MMS/WhatsApp message1": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "388d5337-7d30-44a9-8760-8ff05dc6c226",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "eb7e7d9466c1af928e7edc302d7c6868991ebcbe0d42811a624c8d5864492e4a"
+  },
+  "id": "ETlxyEir6EvHrmqs",
+  "tags": []
+}
