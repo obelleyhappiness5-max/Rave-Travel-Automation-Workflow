@@ -1,6 +1,8 @@
 Rave Travel Lead Automation Documentation
 The Rave Travel lead automation is a WhatsApp lead acquisition and conversion system built for a travel destination company.
+
 Project Overview
+
 This project automates the entire lead management process for a travel company using artificial intelligence and workflow automation. When a potential customer sends a WhatsApp message, the system engages them intelligently, collects their study and destination details, qualifies their intent, and stores everything in a spreadsheet.
 The system is capable of holding a full multi-turn conversation with a lead, matching their budget to suitable travel destinations.
 
